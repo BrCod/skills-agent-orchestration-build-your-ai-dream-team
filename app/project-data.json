@@ -1,0 +1,36 @@
+{
+  "projects": [
+    {
+      "name": "Community Portal",
+      "owner": "Mona Patel",
+      "status": "In progress",
+      "recentActivity": "Contributor onboarding flow approved",
+      "priority": "High",
+      "summary": "Make it easier for new contributors to find a good first issue and get started."
+    },
+    {
+      "name": "Data Health",
+      "owner": "Jordan Lee",
+      "status": "On track",
+      "recentActivity": "Automated validation checks added to the nightly run",
+      "priority": "Medium",
+      "summary": "Improve confidence in shared datasets with clear quality checks and ownership."
+    },
+    {
+      "name": "Mobile Refresh",
+      "owner": "Alex Rivera",
+      "status": "Needs attention",
+      "recentActivity": "Accessibility review identified two navigation issues",
+      "priority": "High",
+      "summary": "Update the mobile experience while keeping navigation accessible and predictable."
+    },
+    {
+      "name": "Documentation Garden",
+      "owner": "Sam Chen",
+      "status": "On track",
+      "recentActivity": "Quick-start guide updated with local preview instructions",
+      "priority": "Low",
+      "summary": "Keep practical, welcoming documentation easy for contributors to discover and maintain."
+    }
+  ]
+}

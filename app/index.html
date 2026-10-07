@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A clear, contributor-friendly overview of current project status and activity.">
+    <title>Project Pulse</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="dashboard">
+      <header class="dashboard-header">
+        <p class="eyebrow">Team overview</p>
+        <h1>Project Pulse</h1>
+        <p>See what teams are working on, who owns it, and where help may be needed.</p>
+      </header>
+
+      <section class="project-section" aria-labelledby="projects-heading">
+        <div class="project-list-header">
+          <div>
+            <p class="eyebrow">The work in motion</p>
+            <h2 id="projects-heading" class="section-title">Projects</h2>
+          </div>
+        </div>
+        <p id="project-state" class="project-count" role="status" aria-live="polite">Loading projects…</p>
+        <div id="project-list" class="project-list" aria-describedby="project-state"></div>
+      </section>
+    </main>
+
+    <script>
+      const projectState = document.querySelector("#project-state");
+      const projectList = document.querySelector("#project-list");
+      const requiredFields = ["name", "owner", "status", "recentActivity", "priority", "summary"];
+
+      function addDetail(card, label, value, className) {
+        const detail = document.createElement("div");
+        detail.className = "project-detail";
+
+        const term = document.createElement("dt");
+        term.textContent = label;
+        const description = document.createElement("dd");
+        description.textContent = value;
+        if (className) {
+          description.classList.add(className);
+          if (className === "project-status") {
+            const statusStyles = {
+              "In progress": "active",
+              "On track": "on-track",
+              "Needs attention": "at-risk"
+            };
+            description.dataset.status = statusStyles[value] || value.toLowerCase().replaceAll(" ", "-");
+          } else if (className === "project-priority") {
+            description.dataset.priority = value.toLowerCase();
+          }
+        }
+
+        detail.append(term, description);
+        card.querySelector("dl").append(detail);
+      }
+
+      function renderProject(project) {
+        const card = document.createElement("article");
+        card.className = "project-card";
+
+        const heading = document.createElement("h3");
+        heading.className = "project-name";
+        heading.textContent = project.name;
+
+        const summary = document.createElement("p");
+        summary.className = "project-summary";
+        summary.textContent = project.summary;
+
+        const details = document.createElement("dl");
+        card.append(heading, summary, details);
+        addDetail(card, "Owner", project.owner);
+        addDetail(card, "Status", project.status, "project-status");
+        addDetail(card, "Recent activity", project.recentActivity);
+        addDetail(card, "Priority", project.priority, "project-priority");
+
+        return card;
+      }
+
+      async function loadProjects() {
+        try {
+          const response = await fetch("project-data.json");
+          if (!response.ok) {
+            throw new Error(`Project data request failed (${response.status}).`);
+          }
+
+          const data = await response.json();
+          if (!data || !Array.isArray(data.projects)) {
+            throw new Error("Project data must contain a projects array.");
+          }
+          if (data.projects.some((project) =>
+            !project || requiredFields.some((field) =>
+              typeof project[field] !== "string" || project[field].trim() === ""
+            )
+          )) {
+            throw new Error("One or more projects are missing required details.");
+          }
+
+          if (data.projects.length === 0) {
+            projectState.className = "empty-state";
+            projectState.textContent = "No projects to show yet.";
+            return;
+          }
+
+          const cards = data.projects.map(renderProject);
+          projectList.replaceChildren(...cards);
+          projectState.className = "project-count";
+          projectState.textContent = `${cards.length} ${cards.length === 1 ? "project" : "projects"} loaded.`;
+        } catch (error) {
+          projectState.className = "error-state";
+          projectState.setAttribute("role", "alert");
+          projectState.textContent = `Unable to load projects. ${error.message} Please try again later.`;
+        }
+      }
+
+      loadProjects();
+    </script>
+  </body>
+</html>
